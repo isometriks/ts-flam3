@@ -23,7 +23,7 @@ export default class Renderer {
 
         //const color = new Color("sRGB", bucket.toRGB())
         //color.lch.c *= 1.4;
-        const [r, g, b] = bucket.toRGB();
+        const [r, g, b] = bucket.toRGB(this.histogram.max);
         const color = { r, g, b }
 
         pixels[offset] = color.r * 255

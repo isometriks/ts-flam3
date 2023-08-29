@@ -13,8 +13,8 @@ export default class Bucket {
     this.a += 1;
   }
 
-  toRGB() {
-    const logA = Math.log(this.a);
+  toRGB(max?: number) {
+    const logA = Math.log((max ?? this.a) * 0.8);
 
     return [
       Math.log(this.r) / logA,

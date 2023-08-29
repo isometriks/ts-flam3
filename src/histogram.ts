@@ -5,6 +5,7 @@ export default class Histogram {
   width: number
   height: number
   buckets: Bucket[][]
+  max: number = 0
 
   constructor(width: number, height: number) {
     this.width = width
@@ -29,7 +30,10 @@ export default class Histogram {
       return;
     }
 
-    this.get(px, py).add(color);
+    const bucket = this.get(px, py)
+    bucket.add(color)
+
+    this.max = Math.max(bucket.a, this.max)
   }
 
   get(x: number, y: number) {
