@@ -28,12 +28,12 @@ export default class AffineTransform implements Transform {
   static rotation(radians: number): AffineTransform {
     return new this([
       [
-        Math.cos(radians / 4),
-        -Math.sin(radians / 4),
+        Math.cos(radians),
+        -Math.sin(radians),
         0,
       ], [
-        Math.sin(radians / 4),
-        Math.cos(radians / 4),
+        Math.sin(radians),
+        Math.cos(radians),
         0
       ],
     ])
