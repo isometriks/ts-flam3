@@ -20,6 +20,9 @@ export default class Iterator {
       this.transforms[i] = AffineTransform.random()
       this.colors[i] = Color.random()
     }
+
+    this.x = Math.random() * 2 - 1
+    this.y = Math.random() * 2 - 1
   }
 
   iterate(iterations: number) {
