@@ -18,10 +18,15 @@ export default class Color {
   }
 
   static random() {
-    return new this(
-      Math.random(),
-      Math.random(),
-      Math.random()
-    )
+    const colors = [
+      [1, 0.2, 0.2],
+      [0.2, 1, 0.2],
+      [0.2, 0.2, 1],
+      [1, 1, 0],
+    ];
+
+    const [r, g, b] = colors[Math.round(Math.random() * (colors.length - 1))]
+
+    return new this(r, g, b)
   }
 }

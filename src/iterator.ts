@@ -38,6 +38,11 @@ export default class Iterator {
       const transform = this.transforms[f];
 
       this.#applyTransform(transform, color);
+
+      this.histogram.plot(this.x, this.y, this.color);
+      this.histogram.plot(this.x, -this.y, this.color);
+      this.histogram.plot(-this.x, this.y, this.color);
+      this.histogram.plot(-this.x, -this.y, this.color);
     }
   }
 
@@ -48,7 +53,7 @@ export default class Iterator {
 
     const variations= [
       [0.15, new SwirlTransform()],
-      // [0.0005, new SphericalTransform()],
+      [0.0005, new SphericalTransform()],
     ] as [number, Transform][]
 
     let [addX, addY] = [0, 0]
@@ -62,7 +67,5 @@ export default class Iterator {
 
     this.x += addX;
     this.y += addY;
-
-    this.histogram.plot(this.x, this.y, this.color);
   }
 }

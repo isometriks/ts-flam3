@@ -37,6 +37,23 @@ export default class Histogram {
   }
 
   get(x: number, y: number) {
-    return this.buckets[y][x];
+    return this.buckets[y][x]
+  }
+
+  set(x: number, y: number, bucket: Bucket) {
+    this.buckets[y][x] = bucket
+  }
+
+  clone() {
+    const cloned = new Histogram(this.width, this.height)
+    cloned.max = this.max
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        cloned.set(x, y, this.get(x, y).clone())
+      }
+    }
+
+    return cloned
   }
 }
