@@ -4,6 +4,7 @@ import Transform from "./transform.ts"
 import AffineTransform from "./variations/affine.ts"
 import SphericalTransform from "./variations/spherical.ts";
 import SwirlTransform from "./variations/swirl.ts";
+import CompositeTransform from "./variations/composite.ts";
 
 export default class Iterator {
   histogram: Histogram
@@ -17,7 +18,7 @@ export default class Iterator {
     this.histogram = histogram;
 
     for (let i=0; i<5; i++) {
-      this.transforms[i] = AffineTransform.random()
+      this.transforms[i] = CompositeTransform.random()
       this.colors[i] = Color.random()
     }
 
@@ -45,23 +46,6 @@ export default class Iterator {
     this.color = this.color.mix(color);
 
     [this.x, this.y] = transform.apply(this.x, this.y);
-
-    const variations= [
-      [0.15, new SwirlTransform()],
-      // [0.0005, new SphericalTransform()],
-    ] as [number, Transform][]
-
-    let [addX, addY] = [0, 0]
-
-    for (const [weight, variation] of variations) {
-      const [vx, vy] = variation.apply(this.x, this.y)
-
-      addX += vx * weight
-      addY += vy * weight
-    }
-
-    this.x += addX;
-    this.y += addY;
 
     this.histogram.plot(this.x, this.y, this.color);
   }
