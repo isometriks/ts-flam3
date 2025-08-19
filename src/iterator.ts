@@ -17,7 +17,7 @@ export default class Iterator {
   constructor(histogram: Histogram) {
     this.histogram = histogram;
 
-    for (let i=0; i<5; i++) {
+    for (let i=0; i<(3 + Math.random() * 3); i++) {
       this.transforms[i] = CompositeTransform.random()
       this.colors[i] = Color.random()
     }
