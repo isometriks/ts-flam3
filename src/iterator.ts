@@ -31,22 +31,17 @@ export default class Iterator {
 
     for (let i = 0; i < iterations; i++) {
       if (Math.round(Math.random()*1) === 0) {
-        this.#applyTransform(rotation, this.color);
+        [this.x, this.y] = rotation.apply(this.x, this.y);
       }
 
       const f = Math.round(Math.random() * (this.transforms.length - 1))
       const color = this.colors[f];
       const transform = this.transforms[f];
 
-      this.#applyTransform(transform, color);
+      this.color = this.color.mix(color);
+      [this.x, this.y] = transform.apply(this.x, this.y);
+
+      this.histogram.plot(this.x, this.y, this.color);
     }
-  }
-
-  #applyTransform(transform: Transform, color: Color) {
-    this.color = this.color.mix(color);
-
-    [this.x, this.y] = transform.apply(this.x, this.y);
-
-    this.histogram.plot(this.x, this.y, this.color);
   }
 }
