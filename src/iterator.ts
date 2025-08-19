@@ -27,12 +27,9 @@ export default class Iterator {
   }
 
   iterate(iterations: number) {
-    const rotation = AffineTransform.rotation(Math.PI / 4)
+    const rotation = AffineTransform.rotation(2 * Math.PI / 4)
 
     for (let i = 0; i < iterations; i++) {
-      if (Math.round(Math.random()*1) === 0) {
-        [this.x, this.y] = rotation.apply(this.x, this.y);
-      }
 
       const f = Math.round(Math.random() * (this.transforms.length - 1))
       const color = this.colors[f];
@@ -40,7 +37,9 @@ export default class Iterator {
 
       this.color = this.color.mix(color);
       [this.x, this.y] = transform.apply(this.x, this.y);
-
+      if (Math.random() > 0.5) {
+        [this.x, this.y] = rotation.apply(this.x, this.y);
+      }
       this.histogram.plot(this.x, this.y, this.color);
     }
   }

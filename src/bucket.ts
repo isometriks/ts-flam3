@@ -6,11 +6,11 @@ export default class Bucket {
   b: number = 0;
   a: number = 255;
 
-  add(color: Color) {
-    this.r += color.r;
-    this.g += color.g;
-    this.b += color.b;
-    this.a += 1;
+  add(color: Color, weight: number = 1) {
+    this.r += color.r * weight;
+    this.g += color.g * weight;
+    this.b += color.b * weight;
+    this.a += weight;
   }
 
   toRGB(max?: number) {

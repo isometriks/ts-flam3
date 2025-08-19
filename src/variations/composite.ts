@@ -8,6 +8,7 @@ import BubbleTransform from "./bubble.ts";
 import SpiralTransform from "./spiral.ts";
 import HandkerchiefTransform from "./handkerchief.ts";
 import PolarTransform from "./polar.ts";
+import LinearTransform from "./linear.ts";
 
 export default class CompositeTransform implements Transform {
   #affine: AffineTransform;
@@ -29,7 +30,7 @@ export default class CompositeTransform implements Transform {
       addY += vy * weight
     }
 
-    return [x + addX, y + addY]
+    return [addX, addY]
   }
 
   static random()
@@ -38,18 +39,19 @@ export default class CompositeTransform implements Transform {
 
     // Available transform classes
     const availableTransforms = [
+      //LinearTransform,
       SwirlTransform,
       SphericalTransform,
-      SinusoidalTransform,
+      //SinusoidalTransform,
       HorseshoeTransform,
       BubbleTransform,
       SpiralTransform,
       HandkerchiefTransform,
-      PolarTransform,
+      //PolarTransform,
     ]
 
     // Randomly select 1-4 variations
-    const numVariations = Math.floor(Math.random() * 4) + 1
+    const numVariations = Math.floor(Math.random() * 2) + 1
 
     // Shuffle and select unique transforms
     const shuffled = [...availableTransforms].sort(() => Math.random() - 0.5)
@@ -57,9 +59,13 @@ export default class CompositeTransform implements Transform {
 
     // Create variations with random weights
     const variations: [number, Transform][] = selectedTransforms.map(TransformClass => [
-      Math.random() * 0.03,
+      Math.random() * 0.05,
       new TransformClass()
     ])
+
+    const sum = variations.reduce((accumulator, currentValue) => accumulator + currentValue[0], 0);
+
+    variations.unshift([1 - sum, new LinearTransform()])
 
     return new this(affine, variations)
   }
