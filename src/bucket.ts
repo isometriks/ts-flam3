@@ -13,21 +13,36 @@ export default class Bucket {
     this.a += 1;
   }
 
-  toRGB(max: number, gamma: number = 2.2) {
+  toRGB(
+    max: number,
+    opts: { gamma?: number; brightness?: number; vibrancy?: number } = {},
+  ) {
     if (this.a === 0 || max <= 0) {
       return [0, 0, 0, 0];
     }
 
-    // Log-density tone map: α_scaled = log(1 + α) / log(1 + α_max) in [0, 1].
-    // Then normalize accumulated color by hit count and weight by α_scaled^(1/γ).
-    const density = Math.log(1 + this.a) / Math.log(1 + max);
-    const scale = Math.pow(density, 1 / gamma);
+    const gamma = opts.gamma ?? 4;
+    const brightness = opts.brightness ?? 1;
+    const vibrancy = opts.vibrancy ?? 1;
+    const invGamma = 1 / gamma;
 
-    return [
-      (this.r / this.a) * scale,
-      (this.g / this.a) * scale,
-      (this.b / this.a) * scale,
-      this.a,
-    ];
+    // Log-density scaling: α_scaled ∈ [0, 1]. Brightness lifts the log curve
+    // before normalization so dim buckets contribute more.
+    const alphaScaled =
+      Math.log(1 + brightness * this.a) / Math.log(1 + brightness * max);
+    const densityGamma = Math.pow(alphaScaled, invGamma);
+
+    // Vibrancy interpolates between two gamma placements:
+    // - vibrancy=1: gamma on density only, preserves color ratios (saturated).
+    // - vibrancy=0: gamma on the whole channel value, desaturates (film-like).
+    const toneMap = (sum: number) => {
+      const c = sum / this.a;
+      return (
+        vibrancy * c * densityGamma +
+        (1 - vibrancy) * Math.pow(c * alphaScaled, invGamma)
+      );
+    };
+
+    return [toneMap(this.r), toneMap(this.g), toneMap(this.b), this.a];
   }
 }

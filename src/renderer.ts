@@ -2,6 +2,9 @@ import Histogram from "./histogram.ts";
 
 export default class Renderer {
   histogram: Histogram;
+  gamma: number = 4;
+  brightness: number = 1;
+  vibrancy: number = 1;
 
   constructor(histogram: Histogram) {
     this.histogram = histogram;
@@ -16,20 +19,23 @@ export default class Renderer {
     const id = ctx.getImageData(0, 0, this.histogram.width, this.histogram.height)
     const pixels = id.data
 
+    const toneOpts = {
+      gamma: this.gamma,
+      brightness: this.brightness,
+      vibrancy: this.vibrancy,
+    };
+
     for (let y = 0; y < this.histogram.height; y++) {
       for (let x = 0; x < this.histogram.width; x++) {
         const bucket = this.histogram.get(x, y)
         const offset = (x + y * this.histogram.width) * 4
 
-        //const color = new Color("sRGB", bucket.toRGB())
-        //color.lch.c *= 1.4;
-        const [r, g, b] = bucket.toRGB(this.histogram.max);
-        const color = { r, g, b }
+        const [r, g, b] = bucket.toRGB(this.histogram.max, toneOpts);
 
-        pixels[offset] = color.r * 255
-        pixels[offset + 1] = color.g * 255
-        pixels[offset + 2] = color.b * 255
-        pixels[offset + 3] = 255 //a * 255
+        pixels[offset] = r * 255
+        pixels[offset + 1] = g * 255
+        pixels[offset + 2] = b * 255
+        pixels[offset + 3] = 255
       }
     }
 
