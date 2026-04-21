@@ -1,47 +1,42 @@
 import Histogram from "./histogram.ts"
 import Color from "./color.ts"
+import Palette from "./palette.ts"
 import Transform from "./transform.ts"
-import AffineTransform from "./variations/affine.ts"
-import SphericalTransform from "./variations/spherical.ts";
-import SwirlTransform from "./variations/swirl.ts";
-import CompositeTransform from "./variations/composite.ts";
+import CompositeTransform from "./variations/composite.ts"
 
 export default class Iterator {
   histogram: Histogram
   transforms: Transform[] = []
-  colors: Color[] = []
-  color: Color = new Color()
+  colorCoords: number[] = []
+  palette: Palette
+  c: number = 0
   x = 0
   y = 0
+  #scratchColor: Color = new Color()
 
   constructor(histogram: Histogram) {
     this.histogram = histogram;
+    this.palette = Palette.random();
 
-    for (let i=0; i<(3 + Math.random() * 3); i++) {
-      this.transforms[i] = CompositeTransform.random()
-      this.colors[i] = Color.random()
+    const n = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < n; i++) {
+      this.transforms.push(CompositeTransform.random());
+      this.colorCoords.push(Math.random());
     }
 
     this.x = Math.random() * 2 - 1
     this.y = Math.random() * 2 - 1
+    this.c = Math.random()
   }
 
   iterate(iterations: number) {
-    const rotation = AffineTransform.rotation(Math.PI / 4)
-
     for (let i = 0; i < iterations; i++) {
-      if (Math.round(Math.random()*1) === 0) {
-        [this.x, this.y] = rotation.apply(this.x, this.y);
-      }
+      const f = Math.floor(Math.random() * this.transforms.length)
+      this.c = (this.c + this.colorCoords[f]) / 2;
+      [this.x, this.y] = this.transforms[f].apply(this.x, this.y);
 
-      const f = Math.round(Math.random() * (this.transforms.length - 1))
-      const color = this.colors[f];
-      const transform = this.transforms[f];
-
-      this.color = this.color.mix(color);
-      [this.x, this.y] = transform.apply(this.x, this.y);
-
-      this.histogram.plot(this.x, this.y, this.color);
+      this.palette.lookup(this.c, this.#scratchColor);
+      this.histogram.plot(this.x, this.y, this.#scratchColor);
     }
   }
 }

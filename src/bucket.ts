@@ -1,5 +1,44 @@
 import Color from "./color.ts";
 
+export interface ToneMapOpts {
+  gamma?: number;
+  brightness?: number;
+  vibrancy?: number;
+}
+
+// Log-density tone map. Works on any (R, G, B, count) triple plus a reference
+// max, so it can be reused by the raw per-bucket path and by the supersampled
+// downsample path in Renderer. See flam3.md §1.4.
+export function toneMap(
+  r: number,
+  g: number,
+  b: number,
+  count: number,
+  max: number,
+  opts: ToneMapOpts = {},
+): [number, number, number, number] {
+  if (count === 0 || max <= 0) return [0, 0, 0, 0];
+
+  const gamma = opts.gamma ?? 4;
+  const brightness = opts.brightness ?? 1;
+  const vibrancy = opts.vibrancy ?? 1;
+  const invGamma = 1 / gamma;
+
+  const alphaScaled =
+    Math.log(1 + brightness * count) / Math.log(1 + brightness * max);
+  const densityGamma = Math.pow(alphaScaled, invGamma);
+
+  const map = (sum: number) => {
+    const c = sum / count;
+    return (
+      vibrancy * c * densityGamma +
+      (1 - vibrancy) * Math.pow(c * alphaScaled, invGamma)
+    );
+  };
+
+  return [map(r), map(g), map(b), count];
+}
+
 export default class Bucket {
   r: number = 0;
   g: number = 0;
@@ -13,36 +52,7 @@ export default class Bucket {
     this.a += 1;
   }
 
-  toRGB(
-    max: number,
-    opts: { gamma?: number; brightness?: number; vibrancy?: number } = {},
-  ) {
-    if (this.a === 0 || max <= 0) {
-      return [0, 0, 0, 0];
-    }
-
-    const gamma = opts.gamma ?? 4;
-    const brightness = opts.brightness ?? 1;
-    const vibrancy = opts.vibrancy ?? 1;
-    const invGamma = 1 / gamma;
-
-    // Log-density scaling: α_scaled ∈ [0, 1]. Brightness lifts the log curve
-    // before normalization so dim buckets contribute more.
-    const alphaScaled =
-      Math.log(1 + brightness * this.a) / Math.log(1 + brightness * max);
-    const densityGamma = Math.pow(alphaScaled, invGamma);
-
-    // Vibrancy interpolates between two gamma placements:
-    // - vibrancy=1: gamma on density only, preserves color ratios (saturated).
-    // - vibrancy=0: gamma on the whole channel value, desaturates (film-like).
-    const toneMap = (sum: number) => {
-      const c = sum / this.a;
-      return (
-        vibrancy * c * densityGamma +
-        (1 - vibrancy) * Math.pow(c * alphaScaled, invGamma)
-      );
-    };
-
-    return [toneMap(this.r), toneMap(this.g), toneMap(this.b), this.a];
+  toRGB(max: number, opts: ToneMapOpts = {}) {
+    return toneMap(this.r, this.g, this.b, this.a, max, opts);
   }
 }

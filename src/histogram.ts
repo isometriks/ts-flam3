@@ -22,7 +22,7 @@ export default class Histogram {
   }
 
   plot(x: number, y: number, color: Color) {
-    const factor = Math.min(this.width, this.height) * 0.8
+    const factor = Math.min(this.width, this.height) * 0.2
     const px = Math.round(x * factor + this.width/2)
     const py = Math.round(y * factor + this.height/2)
 

@@ -8,20 +8,4 @@ export default class Color {
     this.g = g;
     this.b = b;
   }
-
-  mix(color: Color) {
-    return new Color(
-      (this.r + color.r) / 2,
-      (this.g + color.g) / 2,
-      (this.b + color.b) / 2,
-    )
-  }
-
-  static random() {
-    return new this(
-      Math.random(),
-      Math.random(),
-      Math.random()
-    )
-  }
 }

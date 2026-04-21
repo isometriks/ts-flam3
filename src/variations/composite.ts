@@ -55,10 +55,16 @@ export default class CompositeTransform implements Transform {
     const shuffled = [...availableTransforms].sort(() => Math.random() - 0.5)
     const selectedTransforms = shuffled.slice(0, numVariations)
 
-    // Create variations with random weights
-    const variations: [number, Transform][] = selectedTransforms.map(TransformClass => [
-      Math.random() * 0.03,
-      new TransformClass()
+    // Draw raw weights in [0, 1), then normalize so they sum to 1. This keeps
+    // the overall variation magnitude consistent regardless of how many were
+    // selected, while still letting one variation dominate when it happens to
+    // draw a much larger raw weight than the others.
+    const rawWeights = selectedTransforms.map(() => Math.random())
+    const total = rawWeights.reduce((sum, w) => sum + w, 0) || 1
+
+    const variations: [number, Transform][] = selectedTransforms.map((TransformClass, i) => [
+      rawWeights[i] / total,
+      new TransformClass(),
     ])
 
     return new this(affine, variations)
