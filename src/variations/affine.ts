@@ -25,7 +25,17 @@ export default class AffineTransform implements Transform {
     ] as [number, number]
   }
 
-  static rotation(radians: number): AffineTransform {
+  rotate(radians: number) {
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const [[a, b, c], [d, e, f]] = this.matrix;
+    this.matrix = [
+      [a * cos - d * sin, b * cos - e * sin, c * cos - f * sin],
+      [a * sin + d * cos, b * sin + e * cos, c * sin + f * cos],
+    ];
+  }
+
+  static  rotation(radians: number): AffineTransform {
     return new this([
       [
         Math.cos(radians),

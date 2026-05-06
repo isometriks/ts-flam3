@@ -1,6 +1,7 @@
 import Iterator from "./iterator.ts";
 import Histogram from "./histogram.ts";
 import Renderer from "./renderer.ts";
+import Palette from "./palette.ts";
 
 export default class Flame {
   histogram: Histogram
@@ -25,5 +26,19 @@ export default class Flame {
 
   render() {
     this.renderer.render()
+  }
+
+  rotate(radians: number) {
+    for (const t of this.iterator.transforms) {
+      if ('rotate' in t && typeof t.rotate === 'function') {
+        t.rotate(radians);
+      }
+    }
+    this.histogram.clear();
+  }
+
+  randomizePalette() {
+    this.iterator.palette = Palette.random();
+    this.histogram.clear();
   }
 }

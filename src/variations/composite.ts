@@ -32,6 +32,10 @@ export default class CompositeTransform implements Transform {
     return [x + addX, y + addY]
   }
 
+  rotate(radians: number) {
+    this.#affine.rotate(radians);
+  }
+
   static random()
   {
     const affine = AffineTransform.random()
