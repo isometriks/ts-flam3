@@ -14,7 +14,7 @@ export default class Renderer {
   supersample: number;
 
   // Tone mapping
-  gamma: number = 1.2;
+  gamma: number = 1.6;
   brightness: number = 1;
   vibrancy: number = 1;
 

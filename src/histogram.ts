@@ -22,7 +22,7 @@ export default class Histogram {
   }
 
   plot(x: number, y: number, color: Color) {
-    const factor = Math.min(this.width, this.height) * 0.2
+    const factor = Math.min(this.width, this.height) * 0.08
     const px = Math.round(x * factor + this.width/2)
     const py = Math.round(y * factor + this.height/2)
 
@@ -38,5 +38,18 @@ export default class Histogram {
 
   get(x: number, y: number) {
     return this.buckets[y][x];
+  }
+
+  clear() {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const b = this.buckets[y][x];
+        b.r = 0;
+        b.g = 0;
+        b.b = 0;
+        b.a = 0;
+      }
+    }
+    this.max = 0;
   }
 }
